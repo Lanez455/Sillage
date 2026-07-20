@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SILLAGE — L'art du layering</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0B0908; --surface:#141110; --surface2:#1C1815; --surface3:#241F1A;
+  --line:#2A241E; --line2:#383028;
+  --text:#F3EDE3; --muted:#A2968A; --faint:#6E6459;
+  --gold:#D9A94E; --gold-soft:#EAC98A; --gold-deep:#A87B2E;
+  --btn-g1:#D9A94E; --btn-g2:#A87B2E;
+  --wine:#9A4A3C; --ok:#7BA05B;
+  --side-grad:linear-gradient(180deg,#0D0B09,#0B0908);
+  --topbar-grad:linear-gradient(180deg,rgba(11,9,8,.96) 70%,rgba(11,9,8,0));
+  --mnav-bg:rgba(13,11,9,.92);
+  --formula-bg:rgba(20,17,14,.7);
+  --pv:#12100D;
+  --card-shadow:0 18px 44px rgba(0,0,0,.4);
+  --r:18px; --r-sm:12px;
+  --font-display:"Fraunces",serif; --font-body:"Outfit",sans-serif; --font-mono:"JetBrains Mono",monospace;
+}
+html[data-theme="light"]{
+  --bg:#FAF7F1; --surface:#FFFFFF; --surface2:#F4EEE4; --surface3:#EAE2D4;
+  --line:#E9E1D3; --line2:#D7CCB9;
+  --text:#261E13; --muted:#6E6252; --faint:#9A8D7B;
+  --gold:#9A712A; --gold-soft:#84611F; --gold-deep:#6E4F16;
+  --side-grad:linear-gradient(180deg,#FFFDF9,#FAF7F1);
+  --topbar-grad:linear-gradient(180deg,rgba(250,247,241,.96) 70%,rgba(250,247,241,0));
+  --mnav-bg:rgba(255,253,249,.92);
+  --formula-bg:rgba(22,18,15,.72);
+  --pv:#F1EAE0;
+  --card-shadow:0 14px 34px rgba(70,52,22,.12);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-weight:300;letter-spacing:.01em;overflow-x:hidden}
+::selection{background:rgba(217,169,78,.28)}
+button{font-family:var(--font-body);cursor:pointer;border:none;background:none;color:inherit}
+input,select{font-family:var(--font-body)}
+a{color:inherit;text-decoration:none}
+
+/* ---------- App shell ---------- */
+.app{display:grid;grid-template-columns:248px 1fr;min-height:100vh}
+.sidebar{position:sticky;top:0;height:100vh;padding:28px 20px;border-right:1px solid var(--line);display:flex;flex-direction:column;gap:6px;background:var(--side-grad)}
+.brand{display:flex;align-items:baseline;gap:10px;padding:0 10px 26px}
+.brand-name{font-family:var(--font-display);font-weight:500;font-size:26px;letter-spacing:.14em}
+.brand-name em{font-style:italic;color:var(--gold)}
+.brand-dot{width:7px;height:7px;border-radius:50%;background:var(--gold);box-shadow:0 0 14px rgba(217,169,78,.8)}
+.nav-label{font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--faint);padding:16px 12px 8px}
+.nav-btn{display:flex;align-items:center;gap:12px;width:100%;padding:11px 12px;border-radius:var(--r-sm);color:var(--muted);font-size:14.5px;font-weight:400;transition:all .22s ease;text-align:left}
+.nav-btn svg{width:19px;height:19px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.nav-btn:hover{color:var(--text);background:var(--surface)}
+.nav-btn.active{color:var(--gold-soft);background:linear-gradient(90deg,rgba(217,169,78,.12),rgba(217,169,78,.03));box-shadow:inset 2px 0 0 var(--gold)}
+.side-cta{margin-top:auto;background:linear-gradient(140deg,#1E1812,#171310);border:1px solid var(--line2);border-radius:var(--r);padding:18px;position:relative;overflow:hidden}
+.side-cta::after{content:"";position:absolute;inset:-40% -60% auto auto;width:130px;height:130px;background:radial-gradient(circle,rgba(217,169,78,.22),transparent 70%)}
+.side-cta h4{font-family:var(--font-display);font-weight:500;font-size:16px;margin-bottom:6px}
+.side-cta p{font-size:12.5px;color:var(--muted);line-height:1.5;margin-bottom:12px}
+.btn-gold{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,var(--btn-g1),var(--btn-g2));color:#171104;font-weight:600;font-size:13px;padding:10px 16px;border-radius:999px;transition:transform .2s ease,box-shadow .2s ease}
+.btn-gold:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(217,169,78,.28)}
+.btn-ghost{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line2);color:var(--text);font-size:13px;font-weight:400;padding:10px 16px;border-radius:999px;transition:border-color .2s,background .2s}
+.btn-ghost:hover{border-color:var(--gold-deep);background:rgba(217,169,78,.06)}
+
+.main{min-width:0;padding:0 44px 120px}
+.topbar{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:16px;padding:18px 0;background:var(--topbar-grad);backdrop-filter:blur(8px)}
+.search{flex:1;max-width:520px;display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:11px 18px;transition:border-color .2s}
+.search:focus-within{border-color:var(--gold-deep)}
+.search svg{width:17px;height:17px;stroke:var(--faint);fill:none;stroke-width:1.8;stroke-linecap:round}
+.search input{flex:1;background:none;border:none;outline:none;color:var(--text);font-size:14px;font-weight:300}
+.search input::placeholder{color:var(--faint)}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:14px}
+.avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#8E5A3B,#4A2E1C);display:grid;place-items:center;font-family:var(--font-display);font-size:15px;color:var(--gold-soft);border:1px solid var(--line2);cursor:pointer;transition:box-shadow .2s}
+.avatar:hover{box-shadow:0 0 0 3px rgba(217,169,78,.2)}
+.icon-btn{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;border:1px solid var(--line);color:var(--muted);position:relative;transition:color .2s,border-color .2s}
+.icon-btn:hover{color:var(--gold-soft);border-color:var(--line2)}
+.icon-btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.notif-dot{position:absolute;top:8px;right:9px;width:7px;height:7px;border-radius:50%;background:var(--wine);border:1.5px solid var(--bg)}
+
+.page{display:none;animation:pageIn .45s cubic-bezier(.22,.9,.3,1)}
+.page.active{display:block}
+@keyframes pageIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ---------- Hero ---------- */
+.hero{position:relative;margin-top:10px;border-radius:26px;border:1px solid var(--line);overflow:hidden;background:radial-gradient(120% 160% at 85% -20%,#2B2014 0%,#161210 45%,#0F0C0A 100%)}
+.hero-grain{position:absolute;inset:0;opacity:.5;background-image:radial-gradient(rgba(255,255,255,.045) 1px,transparent 1px);background-size:22px 22px;pointer-events:none}
+.hero-inner{position:relative;display:grid;grid-template-columns:1.05fr .95fr;gap:30px;padding:58px 54px}
+.eyebrow{display:inline-flex;align-items:center;gap:9px;font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:var(--gold);margin-bottom:22px}
+.eyebrow::before{content:"";width:26px;height:1px;background:var(--gold)}
+.hero{color:#F3EDE3}
+.hero .eyebrow{color:#D9A94E}
+.hero .eyebrow::before{background:#D9A94E}
+.hero h1 em{color:#EAC98A!important}
+.hero-sub{color:#A2968A!important}
+.hstat b{color:#EAC98A!important}
+.hstat span{color:#8A7E70!important}
+.hero .btn-ghost{border-color:rgba(243,237,227,.28);color:#F3EDE3}
+.hero .btn-ghost:hover{border-color:#A87B2E;background:rgba(217,169,78,.1)}
+.formula-card,.formula-card .f-name b{color:#F3EDE3}
+.formula-card .f-name span{color:#A2968A}
+.formula-card .f-dose{color:#EAC98A}
+.formula-card .blend-caption b{color:#EAC98A}
+.formula-card .formula-tag .live{color:#D9A94E}
+.formula-card .live-dot{background:#D9A94E}
+.hero h1{font-family:var(--font-display);font-weight:400;font-size:clamp(38px,4.6vw,60px);line-height:1.06;letter-spacing:-.01em}
+.hero h1 em{font-style:italic;color:var(--gold-soft)}
+.hero-sub{margin-top:20px;font-size:16px;line-height:1.65;color:var(--muted);max-width:46ch}
+.hero-actions{display:flex;gap:14px;margin-top:30px;flex-wrap:wrap}
+.hero-stats{display:flex;gap:36px;margin-top:40px}
+.hstat b{display:block;font-family:var(--font-display);font-weight:500;font-size:24px;color:var(--gold-soft)}
+.hstat span{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+
+/* Signature : la Formule vivante */
+.formula-card{position:relative;background:var(--formula-bg);border:1px solid #383028;border-radius:22px;padding:26px 26px 22px;backdrop-filter:blur(4px);align-self:center;box-shadow:0 30px 70px rgba(0,0,0,.45)}
+.formula-tag{font-size:10.5px;letter-spacing:.24em;text-transform:uppercase;color:var(--faint);margin-bottom:18px;display:flex;justify-content:space-between;align-items:center}
+.formula-tag .live{color:var(--gold);display:flex;align-items:center;gap:6px}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:pulse 2.2s infinite}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(217,169,78,.5)}50%{opacity:.6;box-shadow:0 0 0 6px rgba(217,169,78,0)}}
+.f-row{display:flex;align-items:center;gap:14px;padding:10px 0}
+.f-swatch{width:44px;height:56px;border-radius:8px 8px 12px 12px;position:relative;flex-shrink:0;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),0 6px 16px rgba(0,0,0,.4)}
+.f-swatch::before{content:"";position:absolute;top:-7px;left:50%;transform:translateX(-50%);width:14px;height:9px;border-radius:3px 3px 0 0;background:#0e0c0a;border:1px solid var(--line2)}
+.f-name{flex:1;min-width:0}
+.f-name b{display:block;font-weight:500;font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.f-name span{font-size:12px;color:var(--muted)}
+.f-dose{font-family:var(--font-mono);font-size:12.5px;color:var(--gold-soft);background:rgba(217,169,78,.1);border:1px solid rgba(217,169,78,.25);padding:5px 10px;border-radius:8px;white-space:nowrap}
+.f-plus{text-align:center;font-family:var(--font-display);font-style:italic;color:var(--faint);font-size:18px;line-height:1;padding:2px 0}
+.blend-bar{height:12px;border-radius:999px;margin:18px 0 10px;background:linear-gradient(90deg,#5C3520 0%,#7A4A28 38%,#B07A3A 62%,#5E3B22 100%);background-size:220% 100%;animation:blend 7s ease-in-out infinite alternate;box-shadow:inset 0 1px 3px rgba(0,0,0,.5),0 0 22px rgba(176,122,58,.25)}
+@keyframes blend{from{background-position:0% 0}to{background-position:100% 0}}
+.blend-caption{display:flex;justify-content:space-between;font-size:11.5px;color:var(--faint)}
+.blend-caption b{color:var(--gold-soft);font-weight:500}
+
+/* ---------- Sections ---------- */
+.section{margin-top:56px}
+.section-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:22px;gap:16px}
+.section-head h2{font-family:var(--font-display);font-weight:500;font-size:27px;letter-spacing:-.01em}
+.section-head h2 em{font-style:italic;color:var(--gold-soft)}
+.see-all{font-size:13px;color:var(--muted);letter-spacing:.04em;transition:color .2s}
+.see-all:hover{color:var(--gold-soft)}
+
+/* Recipe cards */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:18px}
+.recipe-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px;display:flex;flex-direction:column;gap:14px;transition:transform .25s ease,border-color .25s,box-shadow .25s;cursor:pointer}
+.recipe-card:hover{transform:translateY(-4px);border-color:var(--line2);box-shadow:var(--card-shadow)}
+.rc-top{display:flex;justify-content:space-between;align-items:center}
+.rc-user{display:flex;align-items:center;gap:9px;font-size:12.5px;color:var(--muted)}
+.rc-user .mini-av{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-family:var(--font-display);color:#F3EDE3}
+.badge{font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:4px 9px;border-radius:999px;border:1px solid;white-space:nowrap}
+.badge.gold{color:var(--gold-soft);border-color:rgba(217,169,78,.4);background:rgba(217,169,78,.08)}
+.badge.plain{color:var(--muted);border-color:var(--line2)}
+.rc-title{font-family:var(--font-display);font-weight:500;font-size:20px;line-height:1.25}
+.rc-formula{display:flex;flex-direction:column;gap:7px;background:var(--surface2);border:1px solid var(--line);border-radius:14px;padding:13px 14px}
+.rc-line{display:flex;align-items:center;gap:10px;font-size:13.5px}
+.rc-chip{width:12px;height:12px;border-radius:4px;flex-shrink:0;box-shadow:inset 0 0 0 1px rgba(255,255,255,.15)}
+.rc-line b{font-weight:500;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rc-line .dose{font-family:var(--font-mono);font-size:11.5px;color:var(--gold-soft)}
+.rc-desc{font-size:13.5px;color:var(--muted);line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.tags{display:flex;gap:7px;flex-wrap:wrap}
+.tag{font-size:11px;color:var(--muted);border:1px solid var(--line2);padding:4px 10px;border-radius:999px;letter-spacing:.03em}
+.rc-foot{display:flex;align-items:center;gap:6px;border-top:1px solid var(--line);padding-top:13px;margin-top:auto}
+.act{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--muted);padding:6px 9px;border-radius:9px;transition:color .2s,background .2s}
+.act svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.act:hover{background:var(--surface2);color:var(--text)}
+.act.on{color:var(--gold)}
+.act.on svg{fill:rgba(217,169,78,.25)}
+.stars{margin-left:auto;display:flex;align-items:center;gap:5px;font-size:12.5px;color:var(--gold-soft)}
+.stars svg{width:14px;height:14px;fill:var(--gold);stroke:none}
+
+/* ---------- Parfums ---------- */
+.filter-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px}
+.chip-f{font-size:12.5px;color:var(--muted);border:1px solid var(--line2);padding:8px 15px;border-radius:999px;transition:all .2s}
+.chip-f:hover{color:var(--text);border-color:var(--gold-deep)}
+.chip-f.on{color:#171104;background:linear-gradient(135deg,var(--btn-g1),var(--btn-g2));border-color:transparent;font-weight:500}
+.perfume-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:18px}
+.perfume-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;cursor:pointer;transition:transform .25s ease,border-color .25s,box-shadow .25s}
+.perfume-card:hover{transform:translateY(-4px);border-color:var(--line2);box-shadow:var(--card-shadow)}
+.p-visual{height:150px;position:relative;display:grid;place-items:center;overflow:hidden}
+.p-photo{width:100%;height:100%;object-fit:contain;padding:14px;transition:transform .3s ease}
+.perfume-card:hover .p-photo{transform:scale(1.05)}
+.m-photo{width:76px;height:106px;object-fit:contain;flex-shrink:0;border-radius:12px;background:var(--surface2);padding:6px}
+.p-bottle{width:58px;height:84px;border-radius:10px 10px 14px 14px;position:relative;box-shadow:inset 0 0 0 1px rgba(255,255,255,.18),inset 0 -22px 30px rgba(0,0,0,.3),0 14px 30px rgba(0,0,0,.5);transition:transform .3s ease}
+.p-bottle::before{content:"";position:absolute;top:-11px;left:50%;transform:translateX(-50%);width:20px;height:13px;border-radius:4px 4px 0 0;background:#121009;border:1px solid var(--line2)}
+.p-bottle::after{content:"";position:absolute;top:8px;left:9px;width:10px;height:44px;border-radius:8px;background:linear-gradient(180deg,rgba(255,255,255,.4),rgba(255,255,255,0))}
+.perfume-card:hover .p-bottle{transform:translateY(-4px) rotate(-2deg)}
+.p-info{padding:16px 17px 17px}
+.p-brand{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint)}
+.p-name{font-family:var(--font-display);font-weight:500;font-size:18px;margin:4px 0 8px}
+.p-meta{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--muted)}
+.compat-pill{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;color:var(--gold-soft)}
+.compat-pill svg{width:12px;height:12px;fill:var(--gold);stroke:none}
+
+/* Modal fiche parfum */
+.modal-wrap{position:fixed;inset:0;z-index:90;display:none;align-items:flex-end;justify-content:center;background:rgba(5,4,3,.7);backdrop-filter:blur(6px)}
+.modal-wrap.open{display:flex;animation:fadeIn .25s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal{width:min(680px,100%);max-height:88vh;overflow-y:auto;background:var(--surface);border:1px solid var(--line2);border-radius:24px 24px 0 0;padding:30px 32px 40px;animation:slideUp .38s cubic-bezier(.22,.9,.3,1)}
+@keyframes slideUp{from{transform:translateY(50px);opacity:0}to{transform:none;opacity:1}}
+@media(min-width:720px){.modal-wrap{align-items:center}.modal{border-radius:24px}}
+.modal-close{float:right;color:var(--faint);font-size:22px;line-height:1;padding:4px 8px;border-radius:8px}
+.modal-close:hover{color:var(--text);background:var(--surface2)}
+.m-head{display:flex;gap:22px;align-items:center;margin-bottom:26px}
+.m-head .p-bottle{width:66px;height:96px}
+.m-title h3{font-family:var(--font-display);font-weight:500;font-size:28px}
+.m-title p{color:var(--muted);font-size:13.5px;margin-top:4px}
+.note-cols{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:22px 0}
+.note-col{background:var(--surface2);border:1px solid var(--line);border-radius:14px;padding:14px 15px}
+.note-col h5{font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:9px}
+.note-col ul{list-style:none;font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:5px}
+.m-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px}
+.m-fact{font-size:12px;border:1px solid var(--line2);border-radius:10px;padding:7px 12px;color:var(--muted)}
+.m-fact b{color:var(--text);font-weight:500}
+.m-sub{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--faint);margin:22px 0 12px}
+.compat-list{display:flex;flex-direction:column;gap:9px}
+.compat-item{display:flex;align-items:center;gap:12px;background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:11px 14px;font-size:13.5px;cursor:pointer;transition:border-color .2s}
+.compat-item:hover{border-color:var(--gold-deep)}
+.compat-item .rc-chip{width:14px;height:14px}
+.compat-item b{font-weight:500;flex:1}
+.compat-score{font-family:var(--font-mono);font-size:12px;color:var(--gold-soft)}
+.shop-links{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+.shop{font-size:12.5px;border:1px solid var(--line2);padding:8px 14px;border-radius:10px;color:var(--muted);display:inline-flex;gap:7px;align-items:center;transition:all .2s}
+.shop:hover{color:var(--gold-soft);border-color:var(--gold-deep)}
+.shop svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.aff-note{font-size:11px;color:var(--faint);margin-top:10px}
+
+/* ---------- Labo IA ---------- */
+.lab{display:grid;grid-template-columns:1fr 1.1fr;gap:22px;align-items:start}
+.lab-panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:24px}
+.lab-panel h3{font-family:var(--font-display);font-weight:500;font-size:21px;margin-bottom:6px}
+.lab-panel .sub{font-size:13px;color:var(--muted);margin-bottom:18px;line-height:1.5}
+.lab-select{width:100%;background:var(--surface2);border:1px solid var(--line2);color:var(--text);border-radius:12px;padding:12px 14px;font-size:14px;margin-bottom:12px;outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23A2968A' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
+.lab-select:focus{border-color:var(--gold-deep)}
+.gauge-wrap{display:flex;align-items:center;gap:24px;margin:8px 0 18px}
+.gauge{position:relative;width:130px;height:130px;flex-shrink:0}
+.gauge svg{transform:rotate(-90deg)}
+.gauge-bg{stroke:var(--surface3);stroke-width:9;fill:none}
+.gauge-val{stroke:url(#gaugeGrad);stroke-width:9;fill:none;stroke-linecap:round;transition:stroke-dashoffset 1s cubic-bezier(.22,.9,.3,1)}
+.gauge-num{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--font-display);font-size:30px;font-weight:500;color:var(--gold-soft)}
+.gauge-num small{display:block;font-family:var(--font-body);font-size:10px;letter-spacing:.18em;color:var(--faint);text-transform:uppercase;margin-top:2px;text-align:center}
+.verdict{font-size:14px;line-height:1.6;color:var(--muted)}
+.verdict b{color:var(--text);font-weight:500}
+.shared-notes{display:flex;gap:7px;flex-wrap:wrap;margin:14px 0 18px}
+.note-chip{font-size:12px;color:var(--gold-soft);background:rgba(217,169,78,.09);border:1px solid rgba(217,169,78,.3);padding:5px 11px;border-radius:999px}
+.ratio-box{background:var(--surface2);border:1px solid var(--line);border-radius:14px;padding:15px 16px;font-family:var(--font-mono);font-size:13px;color:var(--text);line-height:1.9}
+.ratio-box em{font-style:normal;color:var(--gold)}
+.lab-empty{color:var(--faint);font-size:13.5px;padding:30px 10px;text-align:center;line-height:1.7}
+
+/* ---------- Classements ---------- */
+.rank-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px}
+.rank-list{display:flex;flex-direction:column;gap:11px}
+.rank-item{display:flex;align-items:center;gap:18px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:15px 20px;transition:border-color .2s,transform .2s;cursor:pointer}
+.rank-item:hover{border-color:var(--line2);transform:translateX(4px)}
+.rank-pos{font-family:var(--font-display);font-style:italic;font-size:24px;color:var(--faint);width:36px;text-align:center;flex-shrink:0}
+.rank-item:nth-child(1) .rank-pos{color:var(--gold)}
+.rank-item:nth-child(2) .rank-pos{color:var(--gold-soft)}
+.rank-item:nth-child(3) .rank-pos{color:#C9B08A}
+.rank-blend{display:flex;flex-shrink:0}
+.rank-blend .rc-chip{width:22px;height:22px;border-radius:7px;border:2px solid var(--surface)}
+.rank-blend .rc-chip+.rc-chip{margin-left:-7px}
+.rank-info{flex:1;min-width:0}
+.rank-info b{font-weight:500;font-size:15px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rank-info span{font-size:12.5px;color:var(--muted)}
+.rank-metric{font-family:var(--font-mono);font-size:12.5px;color:var(--gold-soft);white-space:nowrap}
+
+/* ---------- Profil ---------- */
+.profile-head{display:flex;gap:28px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:30px;position:relative;overflow:hidden}
+.profile-head::after{content:"";position:absolute;inset:auto -80px -120px auto;width:260px;height:260px;background:radial-gradient(circle,rgba(217,169,78,.14),transparent 70%)}
+.big-av{width:92px;height:92px;border-radius:50%;background:linear-gradient(135deg,#8E5A3B,#4A2E1C);display:grid;place-items:center;font-family:var(--font-display);font-size:34px;color:var(--gold-soft);border:2px solid var(--line2);flex-shrink:0}
+.profile-id h3{font-family:var(--font-display);font-weight:500;font-size:26px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.profile-id p{color:var(--muted);font-size:14px;margin-top:6px;max-width:52ch;line-height:1.55}
+.profile-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:20px}
+.pstat{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px 20px}
+.pstat b{font-family:var(--font-display);font-weight:500;font-size:24px;color:var(--gold-soft);display:block}
+.pstat span{font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+.progress{height:7px;background:var(--surface3);border-radius:999px;overflow:hidden;margin-top:10px}
+.progress i{display:block;height:100%;width:72%;border-radius:999px;background:linear-gradient(90deg,var(--gold-deep),var(--gold))}
+.badge-row{display:flex;gap:10px;flex-wrap:wrap}
+.badge-lg{display:flex;align-items:center;gap:9px;font-size:12.5px;border:1px solid var(--line2);border-radius:12px;padding:9px 14px;color:var(--muted)}
+.badge-lg.won{color:var(--gold-soft);border-color:rgba(217,169,78,.35);background:rgba(217,169,78,.06)}
+.badge-lg svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+
+/* Partenaires */
+.partner-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px}
+.partner-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:26px;display:flex;flex-direction:column;gap:14px;transition:transform .25s,border-color .25s,box-shadow .25s}
+.partner-card:hover{transform:translateY(-4px);border-color:var(--line2);box-shadow:var(--card-shadow)}
+.partner-icon{width:52px;height:52px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(140deg,rgba(217,169,78,.16),rgba(168,123,46,.06));border:1px solid rgba(168,123,46,.3)}
+.partner-icon svg{width:24px;height:24px;stroke:var(--gold);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.partner-eyebrow{font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold)}
+.partner-card h3{font-family:var(--font-display);font-weight:500;font-size:21px;line-height:1.2;margin-top:-6px}
+.partner-card>p{font-size:13.5px;color:var(--muted);line-height:1.6}
+.check-list{list-style:none;display:flex;flex-direction:column;gap:10px;margin:4px 0 6px}
+.check-list li{display:flex;gap:11px;font-size:13px;color:var(--muted);line-height:1.55}
+.check-list li::before{content:"✓";flex-shrink:0;width:18px;height:18px;border-radius:6px;display:grid;place-items:center;font-size:11px;color:var(--gold);background:rgba(217,169,78,.12);border:1px solid rgba(168,123,46,.3);margin-top:1px}
+.partner-card .btn-gold{align-self:flex-start;margin-top:auto}
+
+/* Collections */
+.coll-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:16px}
+.coll-card{position:relative;border-radius:var(--r);border:1px solid var(--line);padding:22px;min-height:135px;display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden;cursor:pointer;transition:transform .25s,border-color .25s}
+.coll-card:hover{transform:translateY(-4px);border-color:var(--line2)}
+.coll-card{color:#F3EDE3}
+.coll-card h4{font-family:var(--font-display);font-weight:500;font-size:18px;position:relative}
+.coll-card span{font-size:12px;color:rgba(243,237,227,.75);position:relative}
+.coll-glow{position:absolute;inset:0;opacity:.85}
+
+/* Toast + footer + mobile */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--surface2);border:1px solid var(--line2);color:var(--text);font-size:13.5px;padding:12px 20px;border-radius:999px;z-index:120;opacity:0;transition:all .35s cubic-bezier(.22,.9,.3,1);box-shadow:0 14px 40px rgba(0,0,0,.5);display:flex;gap:9px;align-items:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast .live-dot{background:var(--gold)}
+.footer{margin-top:70px;border-top:1px solid var(--line);padding-top:26px;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;font-size:12.5px;color:var(--faint)}
+.footer b{font-family:var(--font-display);letter-spacing:.14em;color:var(--muted);font-weight:500}
+.mobile-nav{display:none}
+@media(max-width:960px){
+  .app{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .main{padding:0 18px 110px}
+  .hero-inner{grid-template-columns:1fr;padding:36px 26px}
+  .lab{grid-template-columns:1fr}
+  .profile-stats{grid-template-columns:repeat(2,1fr)}
+  .note-cols{grid-template-columns:1fr}
+  .profile-head{flex-direction:column;text-align:center;align-items:center}
+  .profile-id h3{justify-content:center}
+  .hero-stats{gap:22px;flex-wrap:wrap}
+  .mobile-nav{position:fixed;bottom:0;left:0;right:0;z-index:80;display:flex;justify-content:space-around;background:var(--mnav-bg);backdrop-filter:blur(14px);border-top:1px solid var(--line);padding:9px 6px calc(9px + env(safe-area-inset-bottom))}
+  .mobile-nav button{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;letter-spacing:.04em;color:var(--faint);padding:6px 10px;border-radius:10px}
+  .mobile-nav button svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+  .mobile-nav button.active{color:var(--gold-soft)}
+}
+:where(button,a,input,select):focus-visible{outline:2px solid var(--gold);outline-offset:2px;border-radius:8px}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ===== Sidebar ===== -->
+<aside class="sidebar">
+  <div class="brand"><span class="brand-name">SILL<em>A</em>GE</span><span class="brand-dot"></span></div>
+  <div class="nav-label">Découvrir</div>
+  <button class="nav-btn active" data-page="home"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8v9a2 2 0 0 1-2 2h-4v-7h-6v7H5a2 2 0 0 1-2-2z"/></svg>Accueil</button>
+  <button class="nav-btn" data-page="parfums"><svg viewBox="0 0 24 24"><rect x="7" y="8" width="10" height="13" rx="2.5"/><path d="M10 8V5h4v3M9.5 3h5"/></svg>Parfums</button>
+  <button class="nav-btn" data-page="recettes"><svg viewBox="0 0 24 24"><path d="M8 3v7l-4 8a2 2 0 0 0 1.8 3h12.4a2 2 0 0 0 1.8-3l-4-8V3M6.5 3h11"/></svg>Recettes</button>
+  <button class="nav-btn" data-page="classements"><svg viewBox="0 0 24 24"><path d="M4 20h4V10H4zM10 20h4V4h-4zM16 20h4v-8h-4z"/></svg>Classements</button>
+  <div class="nav-label">Créer</div>
+  <button class="nav-btn" data-page="labo"><svg viewBox="0 0 24 24"><path d="M9 3h6M10 3v6l-5.5 9A2 2 0 0 0 6.2 21h11.6a2 2 0 0 0 1.7-3L14 9V3M8 15h8"/></svg>Labo IA</button>
+  <button class="nav-btn" data-page="profil"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 5-5.5 8-5.5s6.5 1.5 8 5.5"/></svg>Mon profil</button>
+  <div class="side-cta">
+    <h4>Sillage Premium</h4>
+    <p>Statistiques avancées, IA illimitée et badges exclusifs.</p>
+    <button class="btn-gold" onclick="toast('Bientôt disponible — merci de votre intérêt !')">Essayer</button>
+  </div>
+</aside>
+
+<!-- ===== Main ===== -->
+<main class="main">
+  <div class="topbar">
+    <div class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      <input id="globalSearch" type="search" placeholder="Parfum, marque, note, saison, occasion…" aria-label="Recherche">
+    </div>
+    <div class="topbar-right">
+      <button class="icon-btn" id="themeBtn" aria-label="Changer de thème" onclick="toggleTheme()"><svg id="themeIcon" viewBox="0 0 24 24"></svg></button>
+      <button class="icon-btn" aria-label="Messagerie" onclick="toast('Messagerie privée — 2 conversations')"><svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-8 8H4l1.7-3.4A8 8 0 1 1 21 12z"/></svg></button>
+      <button class="icon-btn" aria-label="Notifications" onclick="toast('3 nouvelles notifications')"><svg viewBox="0 0 24 24"><path d="M18 9a6 6 0 1 0-12 0c0 6-2 7-2 7h16s-2-1-2-7M10.5 20a1.8 1.8 0 0 0 3 0"/></svg><span class="notif-dot"></span></button>
+      <div class="avatar" data-page="profil" onclick="go('profil')">CR</div>
+    </div>
+  </div>
+
+  <!-- ===== Page Accueil ===== -->
+  <section class="page active" id="page-home">
+    <div class="hero">
+      <div class="hero-grain"></div>
+      <div class="hero-inner">
+        <div>
+          <span class="eyebrow">La référence du layering</span>
+          <h1>Deux parfums.<br>Une <em>signature</em> que personne d'autre ne porte.</h1>
+          <p class="hero-sub">Sillage est le studio communautaire du layering : découvrez, créez et notez les meilleures combinaisons de parfums, guidés par une IA qui comprend les accords.</p>
+          <div class="hero-actions">
+            <button class="btn-gold" onclick="go('labo')">Tester une combinaison</button>
+            <button class="btn-ghost" onclick="go('recettes')">Explorer les recettes</button>
+          </div>
+          <div class="hero-stats">
+            <div class="hstat"><b>12 480</b><span>recettes</span></div>
+            <div class="hstat"><b>3 900</b><span>parfums</span></div>
+            <div class="hstat"><b>58 k</b><span>membres</span></div>
+          </div>
+        </div>
+        <div class="formula-card" aria-label="Formule du jour">
+          <div class="formula-tag"><span>Formule du jour</span><span class="live"><span class="live-dot"></span>N° 0847</span></div>
+          <div class="f-row">
+            <div class="f-swatch" style="background:linear-gradient(160deg,#7A4626,#2E1C11)"></div>
+            <div class="f-name"><b>Ombre Leather</b><span>Tom Ford · Cuir</span></div>
+            <div class="f-dose">2 sprays</div>
+          </div>
+          <div class="f-plus">+</div>
+          <div class="f-row">
+            <div class="f-swatch" style="background:linear-gradient(160deg,#94622F,#3C2716)"></div>
+            <div class="f-name"><b>Jazz Club</b><span>Maison Margiela · Boisé oriental</span></div>
+            <div class="f-dose">1 spray</div>
+          </div>
+          <div class="blend-bar" role="img" aria-label="Fusion des deux parfums"></div>
+          <div class="blend-caption"><span>Cuiré · fumé · vanillé</span><b>Compatibilité 94 %</b></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-head"><h2>Tendances de la <em>semaine</em></h2><a class="see-all" href="#" onclick="go('recettes');return false">Tout voir →</a></div>
+      <div class="cards" id="homeCards"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-head"><h2>Collections à <em>explorer</em></h2><a class="see-all" href="#" onclick="toast('Créez votre propre collection depuis votre profil');return false">Créer la mienne →</a></div>
+      <div class="coll-grid" id="collGrid"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-head"><h2>Rejoindre <em>Sillage</em></h2><span class="see-all">Partenariats &amp; monétisation</span></div>
+      <div class="partner-grid" id="partnerGrid"></div>
+    </div>
+  </section>
+
+  <!-- ===== Page Parfums ===== -->
+  <section class="page" id="page-parfums">
+    <div class="section" style="margin-top:14px">
+      <div class="section-head"><h2>Base de <em>parfums</em></h2><span class="see-all">3 900 références</span></div>
+      <div class="filter-row" id="familyFilters"></div>
+      <div class="perfume-grid" id="perfumeGrid"></div>
+    </div>
+  </section>
+
+  <!-- ===== Page Recettes ===== -->
+  <section class="page" id="page-recettes">
+    <div class="section" style="margin-top:14px">
+      <div class="section-head"><h2>Recettes de la <em>communauté</em></h2><button class="btn-gold" onclick="toast('Éditeur de recette — connectez-vous pour publier')">+ Publier une recette</button></div>
+      <div class="filter-row" id="recipeFilters"></div>
+      <div class="cards" id="recipeCards"></div>
+    </div>
+  </section>
+
+  <!-- ===== Page Labo IA ===== -->
+  <section class="page" id="page-labo">
+    <div class="section" style="margin-top:14px">
+      <div class="section-head"><h2>Labo <em>IA</em></h2><span class="see-all">Analyse d'accords en temps réel</span></div>
+      <div class="lab">
+        <div class="lab-panel">
+          <h3>Composez votre accord</h3>
+          <p class="sub">Choisissez deux parfums : l'IA évalue la cohérence du mélange, identifie les notes qui fusionnent et recommande un ratio.</p>
+          <select class="lab-select" id="labA" aria-label="Premier parfum"></select>
+          <select class="lab-select" id="labB" aria-label="Second parfum"></select>
+          <button class="btn-gold" style="margin-top:6px" onclick="runLab()">Analyser la combinaison</button>
+        </div>
+        <div class="lab-panel" id="labResult">
+          <div class="lab-empty">Sélectionnez deux parfums puis lancez l'analyse.<br>Le score de compatibilité, les notes communes et le ratio recommandé apparaîtront ici.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Page Classements ===== -->
+  <section class="page" id="page-classements">
+    <div class="section" style="margin-top:14px">
+      <div class="section-head"><h2>Classe<em>ments</em></h2></div>
+      <div class="rank-tabs" id="rankTabs"></div>
+      <div class="rank-list" id="rankList"></div>
+    </div>
+  </section>
+
+  <!-- ===== Page Profil ===== -->
+  <section class="page" id="page-profil">
+    <div class="section" style="margin-top:14px">
+      <div class="profile-head">
+        <div class="big-av">CR</div>
+        <div class="profile-id">
+          <h3>Camille Roussel <span class="badge gold">Master Blender</span></h3>
+          <p>Nez amateur à Paris. J'assemble des cuirs et des gourmands depuis 2019 — mon terrain de jeu : les layerings de soirée qui laissent un sillage inoubliable.</p>
+        </div>
+      </div>
+      <div class="profile-stats">
+        <div class="pstat"><b>34</b><span>Recettes</span></div>
+        <div class="pstat"><b>2 180</b><span>Abonnés</span></div>
+        <div class="pstat"><b>12,4 k</b><span>J'aime reçus</span></div>
+        <div class="pstat"><b>8 640</b><span>Score<span class="progress"><i></i></span></span></div>
+      </div>
+      <div class="section">
+        <div class="section-head"><h2>Bad<em>ges</em></h2><span class="see-all">1 360 pts avant « Légende du Layering »</span></div>
+        <div class="badge-row">
+          <span class="badge-lg won"><svg viewBox="0 0 24 24"><path d="M12 2l2.5 5.5L20 8l-4 4 1 6-5-3-5 3 1-6-4-4 5.5-.5z"/></svg>Débutant</span>
+          <span class="badge-lg won"><svg viewBox="0 0 24 24"><path d="M12 2l2.5 5.5L20 8l-4 4 1 6-5-3-5 3 1-6-4-4 5.5-.5z"/></svg>Amateur</span>
+          <span class="badge-lg won"><svg viewBox="0 0 24 24"><path d="M12 2l2.5 5.5L20 8l-4 4 1 6-5-3-5 3 1-6-4-4 5.5-.5z"/></svg>Expert</span>
+          <span class="badge-lg won"><svg viewBox="0 0 24 24"><path d="M12 2l2.5 5.5L20 8l-4 4 1 6-5-3-5 3 1-6-4-4 5.5-.5z"/></svg>Master Blender</span>
+          <span class="badge-lg"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Légende du Layering</span>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-head"><h2>Mes recettes <em>populaires</em></h2></div>
+        <div class="cards" id="profileCards"></div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <span><b>SILLAGE</b> — l'art du layering · Prototype d'interface</span>
+    <span>Certains liens boutiques sont affiliés · Confidentialité · Conditions</span>
+  </footer>
+</main>
+</div>
+
+<!-- Modal fiche parfum -->
+<div class="modal-wrap" id="modalWrap" onclick="if(event.target===this)closeModal()">
+  <div class="modal" role="dialog" aria-modal="true" id="modalBody"></div>
+</div>
+
+<!-- Mobile nav -->
+<nav class="mobile-nav">
+  <button class="active" data-page="home"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8v9a2 2 0 0 1-2 2h-4v-7h-6v7H5a2 2 0 0 1-2-2z"/></svg>Accueil</button>
+  <button data-page="parfums"><svg viewBox="0 0 24 24"><rect x="7" y="8" width="10" height="13" rx="2.5"/><path d="M10 8V5h4v3M9.5 3h5"/></svg>Parfums</button>
+  <button data-page="labo"><svg viewBox="0 0 24 24"><path d="M9 3h6M10 3v6l-5.5 9A2 2 0 0 0 6.2 21h11.6a2 2 0 0 0 1.7-3L14 9V3M8 15h8"/></svg>Labo</button>
+  <button data-page="recettes"><svg viewBox="0 0 24 24"><path d="M8 3v7l-4 8a2 2 0 0 0 1.8 3h12.4a2 2 0 0 0 1.8-3l-4-8V3M6.5 3h11"/></svg>Recettes</button>
+  <button data-page="profil"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 5-5.5 8-5.5s6.5 1.5 8 5.5"/></svg>Profil</button>
+</nav>
+
+<div class="toast" id="toast"><span class="live-dot"></span><span id="toastMsg"></span></div>
+
+<svg width="0" height="0" style="position:absolute"><defs><linearGradient id="gaugeGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#A87B2E"/><stop offset="100%" stop-color="#EAC98A"/></linearGradient></defs></svg>
+<script>
+/* ================= Données ================= */
+/* Champ optionnel img : collez l'URL de la photo officielle issue de votre flux
+   d'affiliation (Awin / CJ / Rakuten — catalogues Sephora, Notino, Douglas…).
+   Exemple : img:"https://votre-cdn.com/ombre-leather.jpg"
+   Sans URL (ou si elle casse), le flacon stylisé s'affiche automatiquement. */
+const PERFUMES=[
+ {id:"ombre",nom:"Ombre Leather",marque:"Tom Ford",annee:2018,famille:"Cuir",accord:"Cuir épicé",intensite:4,longevite:"8–10 h",genre:"Homme",prix:"128 €",c1:"#7A4626",c2:"#2E1C11",
+  tete:["Cardamome"],coeur:["Cuir","Jasmin sambac"],fond:["Ambre","Mousse","Patchouli"]},
+ {id:"jazz",nom:"Jazz Club",marque:"Maison Margiela",annee:2013,famille:"Boisé oriental",accord:"Rhum & tabac",intensite:3,longevite:"6–8 h",genre:"Homme",prix:"135 €",c1:"#94622F",c2:"#3C2716",
+  tete:["Citron","Néroli","Poivre rose"],coeur:["Rhum","Vétiver","Bois clair"],fond:["Tabac","Vanille","Styrax"]},
+ {id:"br540",nom:"Baccarat Rouge 540",marque:"Maison Francis Kurkdjian",annee:2015,famille:"Ambré floral",accord:"Safran ambré",intensite:5,longevite:"12 h+",genre:"Mixte",prix:"235 €",c1:"#B5453C",c2:"#E0A34C",
+  tete:["Safran","Jasmin"],coeur:["Ambre gris","Bois de cèdre"],fond:["Résine de sapin","Ambre"]},
+ {id:"dhi",nom:"Dior Homme Intense",marque:"Dior",annee:2011,famille:"Boisé floral",accord:"Iris poudré",intensite:4,longevite:"8–10 h",genre:"Homme",prix:"115 €",c1:"#6E5E80",c2:"#241D30",
+  tete:["Lavande"],coeur:["Iris","Ambrette","Poire"],fond:["Vétiver","Cèdre de Virginie"]},
+ {id:"bleu",nom:"Bleu de Chanel EDP",marque:"Chanel",annee:2014,famille:"Boisé aromatique",accord:"Frais ambré",intensite:3,longevite:"7–9 h",genre:"Homme",prix:"124 €",c1:"#2E4C6E",c2:"#101A26",
+  tete:["Agrumes","Menthe"],coeur:["Gingembre","Noix de muscade","Jasmin"],fond:["Encens","Vétiver","Cèdre"]},
+ {id:"tv",nom:"Tobacco Vanille",marque:"Tom Ford",annee:2007,famille:"Oriental épicé",accord:"Tabac & vanille",intensite:5,longevite:"12 h+",genre:"Mixte",prix:"265 €",c1:"#6E4423",c2:"#26160B",
+  tete:["Feuille de tabac","Épices"],coeur:["Cacao","Fève tonka","Vanille"],fond:["Bois séché","Fruits secs"]},
+ {id:"gris",nom:"Gris Charnel",marque:"BDK Parfums",annee:2019,famille:"Boisé épicé",accord:"Figue & cardamome",intensite:3,longevite:"7–9 h",genre:"Mixte",prix:"145 €",c1:"#6B6156",c2:"#26211C",
+  tete:["Cardamome","Figue","Thé noir"],coeur:["Bois de santal","Iris"],fond:["Vétiver","Fève tonka","Musc"]},
+ {id:"nuit",nom:"La Nuit de L'Homme",marque:"Yves Saint Laurent",annee:2009,famille:"Oriental boisé",accord:"Cardamome suave",intensite:3,longevite:"6–8 h",genre:"Homme",prix:"98 €",c1:"#463C50",c2:"#17131C",
+  tete:["Cardamome"],coeur:["Lavande","Cèdre","Bergamote"],fond:["Vétiver","Coumarine"]},
+ {id:"libre",nom:"Libre",marque:"Yves Saint Laurent",annee:2019,famille:"Floral oriental",accord:"Lavande solaire",intensite:4,longevite:"8–10 h",genre:"Femme",prix:"112 €",c1:"#D9B45A",c2:"#5E4415",
+  tete:["Mandarine","Lavande","Cassis"],coeur:["Fleur d'oranger","Jasmin"],fond:["Vanille de Madagascar","Musc","Ambre gris"]},
+ {id:"fire",nom:"By the Fireplace",marque:"Maison Margiela",annee:2015,famille:"Boisé ambré",accord:"Marron grillé fumé",intensite:3,longevite:"6–8 h",genre:"Mixte",prix:"135 €",c1:"#8A4A2B",c2:"#2C170C",
+  tete:["Clou de girofle","Baies roses","Fleur d'oranger"],coeur:["Marron glacé","Bois de gaïac"],fond:["Vanille","Cachou","Accord fumé"]}
+];
+const P=Object.fromEntries(PERFUMES.map(p=>[p.id,p]));
+
+const RECIPES=[
+ {id:1,titre:"Cuir fumé du soir",a:"ombre",b:"jazz",doses:[2,1],occ:["Soirée","Hiver","Homme"],note:4.8,votes:412,likes:1240,
+  desc:"Le cuir de Tom Ford enveloppé du rhum et du tabac de Jazz Club : une odeur cuirée, fumée et légèrement vanillée.",
+  user:{n:"Camille R.",ini:"CR",badge:"Master Blender",col:"#8E5A3B"}},
+ {id:2,titre:"Nuage doré",a:"br540",b:"libre",doses:[1,2],occ:["Été","Mixte","Sortie"],note:4.6,votes:298,likes:986,
+  desc:"La lavande solaire de Libre adoucit le safran de BR540 : un sillage lumineux, sucré sans être écœurant.",
+  user:{n:"Aya K.",ini:"AK",badge:"Expert",col:"#5A6E8E"}},
+ {id:3,titre:"Feu de cheminée gourmand",a:"fire",b:"tv",doses:[2,1],occ:["Hiver","Cocooning","Mixte"],note:4.9,votes:521,likes:1730,
+  desc:"Marron grillé, fumée douce et vanille tabac : l'odeur exacte d'un chalet en décembre.",
+  user:{n:"Théo M.",ini:"TM",badge:"Master Blender",col:"#6E4A8E"}},
+ {id:4,titre:"Iris velours",a:"dhi",b:"gris",doses:[2,2],occ:["Bureau","Automne","Homme"],note:4.4,votes:187,likes:642,
+  desc:"L'iris poudré rencontre la figue et le santal : élégant, feutré, jamais envahissant. Parfait sous une chemise.",
+  user:{n:"Lina B.",ini:"LB",badge:"Amateur",col:"#8E3B5A"}},
+ {id:5,titre:"Bleu intense",a:"bleu",b:"nuit",doses:[3,2],occ:["Quotidien","Printemps","Homme"],note:4.2,votes:233,likes:710,
+  desc:"La fraîcheur ambrée du Bleu, densifiée par la cardamome de La Nuit : polyvalent du matin au dîner.",
+  user:{n:"Marc D.",ini:"MD",badge:"Expert",col:"#3B6E5A"}},
+ {id:6,titre:"Vanille royale",a:"br540",b:"tv",doses:[1,1],occ:["Luxe","Soirée","Mixte"],note:4.7,votes:344,likes:1105,
+  desc:"Deux monuments en un seul sillage : safran cristallin sur lit de tabac vanillé. Projection monstrueuse, à doser léger.",
+  user:{n:"Sofia P.",ini:"SP",badge:"Légende",col:"#8E6E3B"}}
+];
+
+const COLLECTIONS=[
+ {t:"Layerings d'été",n:"48 recettes",g:"radial-gradient(120% 120% at 20% 0%,#8E6E2B,#3C2E0E)"},
+ {t:"Layerings de bureau",n:"36 recettes",g:"radial-gradient(120% 120% at 20% 0%,#4A5568,#1A2028)"},
+ {t:"Layerings de luxe",n:"27 recettes",g:"radial-gradient(120% 120% at 20% 0%,#6E3B2B,#26100A)"},
+ {t:"À moins de 100 €",n:"52 recettes",g:"radial-gradient(120% 120% at 20% 0%,#3B6E5A,#0E241C)"},
+ {t:"Layerings gourmands",n:"61 recettes",g:"radial-gradient(120% 120% at 20% 0%,#8E5A3B,#2C160B)"},
+ {t:"Layerings sexy",n:"44 recettes",g:"radial-gradient(120% 120% at 20% 0%,#7A2E3C,#240A10)"}
+];
+
+/* ================= Thème ================= */
+const SUN='<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>';
+const MOON='<path d="M20 13.5A8.5 8.5 0 0 1 10.5 4a8.5 8.5 0 1 0 9.5 9.5z"/>';
+function setTheme(t){
+  document.documentElement.dataset.theme=t;
+  document.getElementById("themeIcon").innerHTML=t==="light"?MOON:SUN;
+}
+function toggleTheme(){
+  const next=document.documentElement.dataset.theme==="light"?"dark":"light";
+  setTheme(next);
+  toast(next==="light"?"Mode clair activé":"Mode sombre activé");
+}
+setTheme("light");
+
+/* ================= Navigation ================= */
+function go(page){
+  document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p.id==="page-"+page));
+  document.querySelectorAll("[data-page]").forEach(b=>b.classList.toggle("active",b.dataset.page===page));
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+document.querySelectorAll("[data-page]").forEach(b=>b.addEventListener("click",()=>go(b.dataset.page)));
+
+let toastTimer;
+function toast(msg){
+  const t=document.getElementById("toast");
+  document.getElementById("toastMsg").textContent=msg;
+  t.classList.add("show");clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove("show"),2600);
+}
+
+/* ================= Rendu recettes ================= */
+const state={likes:{},saves:{}};
+function starSvg(){return '<svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4 6.1 20.5l1.2-6.5L2.5 9.4l6.6-.9z"/></svg>'}
+function recipeCard(r){
+  const a=P[r.a],b=P[r.b];
+  const liked=state.likes[r.id],saved=state.saves[r.id];
+  return `<article class="recipe-card" tabindex="0">
+    <div class="rc-top">
+      <span class="rc-user"><span class="mini-av" style="background:linear-gradient(135deg,${r.user.col},#241812)">${r.user.ini}</span>${r.user.n}</span>
+      <span class="badge ${/Master|Légende/.test(r.user.badge)?"gold":"plain"}">${r.user.badge}</span>
+    </div>
+    <h3 class="rc-title">${r.titre}</h3>
+    <div class="rc-formula">
+      <div class="rc-line"><span class="rc-chip" style="background:linear-gradient(135deg,${a.c1},${a.c2})"></span><b>${a.nom}</b><span class="dose">${r.doses[0]}×</span></div>
+      <div class="rc-line"><span class="rc-chip" style="background:linear-gradient(135deg,${b.c1},${b.c2})"></span><b>${b.nom}</b><span class="dose">${r.doses[1]}×</span></div>
+    </div>
+    <p class="rc-desc">${r.desc}</p>
+    <div class="tags">${r.occ.map(o=>`<span class="tag">${o}</span>`).join("")}</div>
+    <div class="rc-foot">
+      <button class="act ${liked?"on":""}" onclick="event.stopPropagation();toggleLike(${r.id})" aria-label="J'aime">
+        <svg viewBox="0 0 24 24"><path d="M12 20.5S3.5 15 3.5 9.3A4.8 4.8 0 0 1 12 6.5a4.8 4.8 0 0 1 8.5 2.8C20.5 15 12 20.5 12 20.5z"/></svg>${(r.likes+(liked?1:0)).toLocaleString("fr-FR")}</button>
+      <button class="act" onclick="event.stopPropagation();toast('Commentaires — ${Math.round(r.votes/3)} messages')" aria-label="Commenter">
+        <svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-8 8H4l1.7-3.4A8 8 0 1 1 21 12z"/></svg>${Math.round(r.votes/3)}</button>
+      <button class="act ${saved?"on":""}" onclick="event.stopPropagation();toggleSave(${r.id})" aria-label="Enregistrer">
+        <svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg></button>
+      <button class="act" onclick="event.stopPropagation();toast('Recette signalée — notre équipe va vérifier. Merci.')" aria-label="Signaler">
+        <svg viewBox="0 0 24 24"><path d="M5 21V4m0 1h13l-2.5 4L18 13H5"/></svg></button>
+      <span class="stars">${starSvg()}${r.note.toFixed(1).replace(".",",")} · ${r.votes} avis</span>
+    </div>
+  </article>`;
+}
+function toggleLike(id){state.likes[id]=!state.likes[id];renderRecipes();toast(state.likes[id]?"Ajouté à vos j'aime ❤":"Retiré de vos j'aime")}
+function toggleSave(id){state.saves[id]=!state.saves[id];renderRecipes();toast(state.saves[id]?"Enregistré dans vos favoris":"Retiré des favoris")}
+
+let recipeFilter="Toutes";
+function renderRecipes(){
+  const all=["Toutes","Soirée","Hiver","Été","Bureau","Luxe","Quotidien"];
+  document.getElementById("recipeFilters").innerHTML=all.map(f=>`<button class="chip-f ${f===recipeFilter?"on":""}" onclick="recipeFilter='${f}';renderRecipes()">${f}</button>`).join("");
+  const list=RECIPES.filter(r=>recipeFilter==="Toutes"||r.occ.includes(recipeFilter));
+  document.getElementById("recipeCards").innerHTML=list.length?list.map(recipeCard).join(""):'<p class="lab-empty">Aucune recette pour ce filtre — soyez la première personne à en publier une.</p>';
+  document.getElementById("homeCards").innerHTML=[...RECIPES].sort((x,y)=>y.likes-x.likes).slice(0,3).map(recipeCard).join("");
+  document.getElementById("profileCards").innerHTML=RECIPES.filter(r=>r.user.ini==="CR").map(recipeCard).join("")||RECIPES.slice(0,2).map(recipeCard).join("");
+}
+
+/* ================= Parfums ================= */
+let famFilter="Toutes";
+function compatTop(p){
+  return PERFUMES.filter(x=>x.id!==p.id).map(x=>({x,s:score(p,x).total})).sort((a,b)=>b.s-a.s).slice(0,4);
+}
+function renderPerfumes(){
+  const fams=["Toutes",...new Set(PERFUMES.map(p=>p.famille))];
+  document.getElementById("familyFilters").innerHTML=fams.map(f=>`<button class="chip-f ${f===famFilter?"on":""}" onclick="famFilter='${f}';renderPerfumes()">${f}</button>`).join("");
+  const q=(document.getElementById("globalSearch").value||"").toLowerCase();
+  const list=PERFUMES.filter(p=>(famFilter==="Toutes"||p.famille===famFilter)&&(!q||[p.nom,p.marque,p.famille,p.accord,...p.tete,...p.coeur,...p.fond].join(" ").toLowerCase().includes(q)));
+  document.getElementById("perfumeGrid").innerHTML=list.map(p=>{
+    const best=compatTop(p)[0];
+    return `<article class="perfume-card" onclick="openPerfume('${p.id}')" tabindex="0">
+      <div class="p-visual" style="background:radial-gradient(110% 130% at 50% -10%,${p.c1}55,var(--pv) 75%)">
+        ${p.img?`<img class="p-photo" src="${p.img}" alt="Flacon ${p.nom}" loading="lazy" onerror="this.outerHTML='<div class=\\'p-bottle\\' style=\\'background:linear-gradient(160deg,${p.c1},${p.c2})\\'></div>'">`:`<div class="p-bottle" style="background:linear-gradient(160deg,${p.c1},${p.c2})"></div>`}
+      </div>
+      <div class="p-info">
+        <div class="p-brand">${p.marque}</div>
+        <div class="p-name">${p.nom}</div>
+        <div class="p-meta"><span>${p.famille} · ${p.annee}</span>
+        <span class="compat-pill">${starSvg()}${best.s} %</span></div>
+      </div>
+    </article>`;
+  }).join("")||'<p class="lab-empty">Aucun parfum ne correspond à cette recherche.</p>';
+}
+
+function openPerfume(id){
+  const p=P[id];
+  const compat=compatTop(p);
+  document.getElementById("modalBody").innerHTML=`
+    <button class="modal-close" onclick="closeModal()" aria-label="Fermer">×</button>
+    <div class="m-head">
+      ${p.img?`<img class="m-photo" src="${p.img}" alt="Flacon ${p.nom}">`:`<div class="p-bottle" style="background:linear-gradient(160deg,${p.c1},${p.c2})"></div>`}
+      <div class="m-title"><h3>${p.nom}</h3><p>${p.marque} · ${p.annee} · ${p.famille}</p></div>
+    </div>
+    <div class="m-row">
+      <span class="m-fact">Accord principal <b>${p.accord}</b></span>
+      <span class="m-fact">Intensité <b>${"●".repeat(p.intensite)}${"○".repeat(5-p.intensite)}</b></span>
+      <span class="m-fact">Longévité <b>${p.longevite}</b></span>
+      <span class="m-fact">Genre <b>${p.genre}</b></span>
+    </div>
+    <div class="note-cols">
+      <div class="note-col"><h5>Notes de tête</h5><ul>${p.tete.map(n=>`<li>${n}</li>`).join("")}</ul></div>
+      <div class="note-col"><h5>Notes de cœur</h5><ul>${p.coeur.map(n=>`<li>${n}</li>`).join("")}</ul></div>
+      <div class="note-col"><h5>Notes de fond</h5><ul>${p.fond.map(n=>`<li>${n}</li>`).join("")}</ul></div>
+    </div>
+    <div class="m-sub">Meilleures compatibilités layering</div>
+    <div class="compat-list">${compat.map(c=>`
+      <div class="compat-item" onclick="closeModal();go('labo');preset('${p.id}','${c.x.id}')">
+        <span class="rc-chip" style="background:linear-gradient(135deg,${c.x.c1},${c.x.c2})"></span>
+        <b>${c.x.nom}</b><span style="color:var(--faint);font-size:12px">${c.x.marque}</span>
+        <span class="compat-score">${c.s} %</span>
+      </div>`).join("")}
+    </div>
+    <div class="m-sub">Où l'acheter</div>
+    <div class="shop-links">
+      ${["Sephora","Nocibé","Jovoy Paris"].map(s=>`<button class="shop" onclick="toast('Redirection boutique partenaire — ${s}')">${s}<svg viewBox="0 0 24 24"><path d="M7 17L17 7M9 7h8v8"/></svg></button>`).join("")}
+    </div>
+    <p class="aff-note">Prix indicatif ${p.prix} · Liens partenaires : Sillage peut percevoir une commission.</p>`;
+  document.getElementById("modalWrap").classList.add("open");
+  document.body.style.overflow="hidden";
+}
+function closeModal(){document.getElementById("modalWrap").classList.remove("open");document.body.style.overflow=""}
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeModal()});
+
+/* ================= Labo IA ================= */
+function score(a,b){
+  const notes=x=>[...x.tete,...x.coeur,...x.fond];
+  const shared=notes(a).filter(n=>notes(b).some(m=>m.toLowerCase()===n.toLowerCase()));
+  const FAM={"Cuir":["Boisé oriental","Oriental épicé","Boisé épicé","Boisé ambré"],
+    "Boisé oriental":["Cuir","Oriental épicé","Boisé ambré","Ambré floral"],
+    "Ambré floral":["Floral oriental","Oriental épicé","Boisé oriental"],
+    "Boisé floral":["Boisé épicé","Oriental boisé","Boisé aromatique"],
+    "Boisé aromatique":["Oriental boisé","Boisé floral","Boisé épicé"],
+    "Oriental épicé":["Cuir","Boisé ambré","Ambré floral","Boisé oriental"],
+    "Boisé épicé":["Boisé floral","Cuir","Boisé aromatique"],
+    "Oriental boisé":["Boisé aromatique","Boisé floral","Cuir"],
+    "Floral oriental":["Ambré floral","Oriental épicé"],
+    "Boisé ambré":["Oriental épicé","Cuir","Boisé oriental"]};
+  const famScore=a.famille===b.famille?14:(FAM[a.famille]||[]).includes(b.famille)?22:6;
+  const intGap=Math.abs(a.intensite-b.intensite);
+  const total=Math.max(38,Math.min(97,52+shared.length*9+famScore-intGap*4));
+  return {total,shared,intGap};
+}
+function preset(a,b){document.getElementById("labA").value=a;document.getElementById("labB").value=b;runLab()}
+function runLab(){
+  const a=P[document.getElementById("labA").value],b=P[document.getElementById("labB").value];
+  const R=document.getElementById("labResult");
+  if(!a||!b||a.id===b.id){R.innerHTML='<div class="lab-empty">Choisissez deux parfums différents pour lancer l\'analyse.</div>';return}
+  const {total,shared,intGap}=score(a,b);
+  const strong=a.intensite>=b.intensite?a:b, light=strong===a?b:a;
+  const rStrong=intGap>=2?1:2, rLight=intGap>=2?2:intGap===1?2:2;
+  const verdictTxt=total>=85?"Accord excellent — les familles se répondent naturellement.":total>=70?"Accord cohérent — belle complémentarité, à doser avec soin.":total>=55?"Accord audacieux — intéressant sur peau, testez avant de sortir.":"Accord risqué — les pyramides se contrarient plus qu'elles ne fusionnent.";
+  const circ=2*Math.PI*56;
+  R.innerHTML=`
+    <h3>Résultat de l'analyse</h3>
+    <div class="gauge-wrap">
+      <div class="gauge"><svg width="130" height="130"><circle class="gauge-bg" cx="65" cy="65" r="56"/><circle class="gauge-val" cx="65" cy="65" r="56" stroke-dasharray="${circ}" stroke-dashoffset="${circ}"/></svg>
+        <div class="gauge-num"><span>${total}<small>compatibilité</small></span></div></div>
+      <p class="verdict"><b>${a.nom} + ${b.nom}.</b> ${verdictTxt}</p>
+    </div>
+    <div class="m-sub">Notes qui fusionnent</div>
+    <div class="shared-notes">${shared.length?shared.map(n=>`<span class="note-chip">${n}</span>`).join(""):`<span class="note-chip">${a.fond[0]}</span><span class="note-chip">${b.fond[0]}</span><span style="font-size:12px;color:var(--faint);align-self:center">— pont olfactif par les fonds</span>`}</div>
+    <div class="m-sub">Résultat attendu</div>
+    <p class="verdict" style="margin-bottom:16px">Un sillage <b>${a.accord.toLowerCase()}</b> réchauffé par un cœur <b>${b.accord.toLowerCase()}</b>, dominante ${strong.famille.toLowerCase()} en fond.</p>
+    <div class="m-sub">Ratio recommandé</div>
+    <div class="ratio-box">
+      1. <em>${light.nom}</em> — ${rLight} pulvérisation${rLight>1?"s":""} (base, poignets + cou)<br>
+      2. <em>${strong.nom}</em> — ${rStrong} pulvérisation${rStrong>1?"s":""} (par-dessus, 30 s après)
+    </div>`;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    R.querySelector(".gauge-val").style.strokeDashoffset=circ*(1-total/100);
+  }));
+}
+
+/* ================= Classements ================= */
+let rankTab="Les mieux notés";
+const RANKS={
+ "Layerings du jour":r=>[...r].sort(()=>0.5-Math.random()),
+ "Les plus populaires":r=>[...r].sort((a,b)=>b.likes-a.likes),
+ "Les plus originaux":r=>[...r].sort((a,b)=>(score(P[a.a],P[a.b]).shared.length)-(score(P[b.a],P[b.b]).shared.length)),
+ "Les mieux notés":r=>[...r].sort((a,b)=>b.note-a.note),
+ "Tendances de la semaine":r=>[...r].sort((a,b)=>b.votes-a.votes),
+ "Tendances du mois":r=>[...r].sort((a,b)=>(b.votes+b.likes)-(a.votes+a.likes))
+};
+function renderRanks(){
+  document.getElementById("rankTabs").innerHTML=Object.keys(RANKS).map(t=>`<button class="chip-f ${t===rankTab?"on":""}" onclick="rankTab='${t}';renderRanks()">${t}</button>`).join("");
+  const metric=r=>rankTab==="Les mieux notés"?`★ ${r.note.toFixed(1).replace(".",",")}`:rankTab==="Les plus populaires"?`${r.likes.toLocaleString("fr-FR")} ♥`:`${r.votes} avis`;
+  document.getElementById("rankList").innerHTML=RANKS[rankTab](RECIPES).map((r,i)=>{
+    const a=P[r.a],b=P[r.b];
+    return `<div class="rank-item" onclick="go('recettes')">
+      <span class="rank-pos">${i+1}</span>
+      <span class="rank-blend"><span class="rc-chip" style="background:linear-gradient(135deg,${a.c1},${a.c2})"></span><span class="rc-chip" style="background:linear-gradient(135deg,${b.c1},${b.c2})"></span></span>
+      <span class="rank-info"><b>${r.titre}</b><span>${a.nom} + ${b.nom} · par ${r.user.n}</span></span>
+      <span class="rank-metric">${metric(r)}</span>
+    </div>`;
+  }).join("");
+}
+
+/* ================= Init ================= */
+function fillLabSelects(){
+  const opts='<option value="">— Choisir un parfum —</option>'+PERFUMES.map(p=>`<option value="${p.id}">${p.nom} · ${p.marque}</option>`).join("");
+  labA.innerHTML=opts;labB.innerHTML=opts;
+  labA.value="ombre";labB.value="jazz";
+}
+const PARTNERS=[
+ {eyebrow:"Développez votre maison",titre:"Marques de parfum",
+  icon:'<rect x="7" y="8" width="10" height="13" rx="2.5"/><path d="M10 8V5h4v3M9.5 3h5"/>',
+  desc:"Faites découvrir vos jus à une communauté de passionnés qui cherchent activement des idées d'accords.",
+  points:["Fiche officielle vérifiée et mise en avant","Apparaissez dans les recettes et le moteur IA","Statistiques d'intérêt sur vos parfums"],
+  cta:"Devenir partenaire",msg:"Espace marques — présentez votre maison sur Sillage"},
+ {eyebrow:"Vendez plus de flacons",titre:"Boutiques partenaires",
+  icon:'<path d="M3 9l1.5-5h15L21 9M4 9h16v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zM9 13h6"/>',
+  desc:"Chaque parfum recommandé renvoie vers vos fiches produit via des liens trackés — un trafic qualifié, prêt à acheter.",
+  points:["Liens d'affiliation intégrés aux fiches","Vos photos et prix officiels affichés","Commission sur chaque vente générée"],
+  cta:"Connecter ma boutique",msg:"Espace boutiques — intégrez vos flux d'affiliation (Awin, CJ, Rakuten)"},
+ {eyebrow:"Monétisez votre audience",titre:"Créateurs de contenu",
+  icon:'<circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 5-5.5 8-5.5s6.5 1.5 8 5.5"/>',
+  desc:"Nez, influenceurs parfum et vidéastes : publiez vos recettes signature, fédérez vos abonnés et gagnez en réputation.",
+  points:["Profil créateur avec badges exclusifs","Vos recettes mises en avant dans les classements","Revenus partagés sur vos liens d'affiliation"],
+  cta:"Devenir créateur",msg:"Espace créateurs — publiez vos recettes signature"},
+ {eyebrow:"Touchez des passionnés",titre:"Annonceurs",
+  icon:'<path d="M3 11v2a1 1 0 0 0 1 1h2l4 4V6L6 10H4a1 1 0 0 0-1 1zM16 8a5 5 0 0 1 0 8M19 5a9 9 0 0 1 0 14"/>',
+  desc:"Adressez une audience premium, ciblée et engagée, à travers des espaces publicitaires discrets et bien intégrés.",
+  points:["Emplacements natifs, jamais intrusifs","Ciblage par famille olfactive et occasion","Campagnes de marque et contenus sponsorisés"],
+  cta:"Découvrir les solutions",msg:"Espace annonceurs — nos formats publicitaires premium"}
+];
+document.getElementById("partnerGrid").innerHTML=PARTNERS.map(p=>`
+  <article class="partner-card">
+    <div class="partner-icon"><svg viewBox="0 0 24 24">${p.icon}</svg></div>
+    <div class="partner-eyebrow">${p.eyebrow}</div>
+    <h3>${p.titre}</h3>
+    <p>${p.desc}</p>
+    <ul class="check-list">${p.points.map(pt=>`<li>${pt}</li>`).join("")}</ul>
+    <button class="btn-gold" onclick="toast(${JSON.stringify(p.msg)})">${p.cta}</button>
+  </article>`).join("");
+
+document.getElementById("collGrid").innerHTML=COLLECTIONS.map(c=>`
+  <div class="coll-card" onclick="toast('Collection « ${c.t} » — ${c.n}')"><div class="coll-glow" style="background:${c.g}"></div><h4>${c.t}</h4><span>${c.n}</span></div>`).join("");
+document.getElementById("globalSearch").addEventListener("input",()=>{go("parfums");renderPerfumes()});
+renderRecipes();renderPerfumes();renderRanks();fillLabSelects();
+</script>
+</body>
+</html>
